@@ -1,184 +1,630 @@
+{% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>{% trans "Информация пользователя" %}</h5>
-                    </div>
-                    <div class="card-body text-center">
-                        {% if user.profile_picture %}
-                            <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="img-fluid rounded-circle mb-3" style="max-width: 150px;">
-                        {% else %}
-                            <div class="profile-placeholder mb-3">
-                                <i class="fas fa-user-circle fa-5x"></i>
-                            </div>
-                        {% endif %}
-                        
-                        <h4>{{ user.get_full_name }}</h4>
-                        <p class="text-muted">{{ user.get_role_display }}</p>
-                        
-                        <div class="mt-3">
-                            <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">
-                                {% trans "Редактировать профиль" %}
-                            </a>
-                        </div>
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <strong>{% trans "Email:" %}</strong> {{ user.email }}
-                        </li>
-                        {% if user.phone_number %}
-                        <li class="list-group-item">
-                            <strong>{% trans "Телефон:" %}</strong> {{ user.phone_number }}
-                        </li>
-                        {% endif %}
-                        {% if user.date_of_birth %}
-                        <li class="list-group-item">
-                            <strong>{% trans "Дата рождения:" %}</strong> {{ user.date_of_birth }}
-                        </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>{% trans "Дополнительная информация" %}</h5>
-                    </div>
-                    <div class="card-body">
-                        {% if user.role == 'admin' and profile %}
-                            <p><strong>{% trans "Должность:" %}</strong> {{ profile.position }}</p>
-                            <p><strong>{% trans "Уровень доступа:" %}</strong> {{ profile.get_access_level_display }}</p>
-                            {% if profile.responsibility_area %}
-                                <p><strong>{% trans "Область ответственности:" %}</strong> {{ profile.responsibility_area }}</p>
-                            {% endif %}
-                        {% elif user.role == 'teacher' and profile %}
-                            <p><strong>{% trans "Должность:" %}</strong> {{ profile.get_position_display }}</p>
-                            <p><strong>{% trans "Кафедра:" %}</strong> {{ profile.department.name }}</p>
-                            <p><strong>{% trans "Учёная степень:" %}</strong> {{ profile.get_academic_degree_display }}</p>
-                            <p><strong>{% trans "Учёное звание:" %}</strong> {{ profile.get_academic_title_display }}</p>
-                            <p><strong>{% trans "Тип занятости:" %}</strong> {{ profile.get_employment_type_display }}</p>
-                            {% if profile.specialization %}
-                                <p><strong>{% trans "Специализация:" %}</strong> {{ profile.specialization }}</p>
-                            {% endif %}
-                            {% if profile.office_location %}
-                                <p><strong>{% trans "Расположение кабинета:" %}</strong> {{ profile.office_location }}</p>
-                            {% endif %}
-                            {% if profile.office_hours %}
-                                <p><strong>{% trans "Часы консультаций:" %}</strong> {{ profile.office_hours }}</p>
-                            {% endif %}
-                            {% if profile.bio %}
-                                <div class="mt-3">
-                                    <h6>{% trans "Биография:" %}</h6>
-                                    <p>{{ profile.bio }}</p>
-                                </div>
-                            {% endif %}
-                        {% elif user.role == 'student' and profile %}
-                            <p><strong>{% trans "Группа:" %}</strong> {{ profile.group.name }}</p>
-                            <p><strong>{% trans "Номер студенческого:" %}</strong> {{ profile.student_id }}</p>
-                            <p><strong>{% trans "Форма обучения:" %}</strong> {{ profile.get_education_form_display }}</p>
-                            <p><strong>{% trans "Основа обучения:" %}</strong> {{ profile.get_education_basis_display }}</p>
-                            <p><strong>{% trans "Год поступления:" %}</strong> {{ profile.enrollment_year }}</p>
-                            <p><strong>{% trans "Текущий семестр:" %}</strong> {{ profile.current_semester }}</p>
-                            <p><strong>{% trans "Статус:" %}</strong> {{ profile.get_academic_status_display }}</p>
-                            <p><strong>{% trans "Стипендия:" %}</strong> {{ profile.get_scholarship_status_display }}</p>
-                            <p><strong>{% trans "Проживает в общежитии:" %}</strong> {% if profile.has_dormitory %}{% trans "Да" %}{% else %}{% trans "Нет" %}{% endif %}</p>
-                            {% if profile.personal_info %}
-                                <div class="mt-3">
-                                    <h6>{% trans "Дополнительная информация:" %}</h6>
-                                    <p>{{ profile.personal_info }}</p>
-                                </div>
-                            {% endif %}
-                        {% elif user.role == 'methodist' and profile %}
-                            <p><strong>{% trans "Кафедра:" %}</strong> {{ profile.department.name }}</p>
-                            <p><strong>{% trans "Табельный номер:" %}</strong> {{ profile.employee_id }}</p>
-                            <div class="mt-3">
-                                <h6>{% trans "Обязанности:" %}</h6>
-                                <p>{{ profile.responsibilities }}</p>
-                            </div>
-                            {% if profile.managed_groups.all %}
-                                <div class="mt-3">
-                                    <h6>{% trans "Курируемые группы:" %}</h6>
-                                    <ul>
-                                        {% for group in profile.managed_groups.all %}
-                                            <li>{{ group.name }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            {% endif %}
-                        {% elif user.role == 'dean' and profile %}
-                            <p><strong>{% trans "Должность:" %}</strong> {{ profile.get_position_display }}</p>
-                            {% if profile.faculty %}
-                                <p><strong>{% trans "Факультет:" %}</strong> {{ profile.faculty.name }}</p>
-                            {% endif %}
-                            {% if profile.department %}
-                                <p><strong>{% trans "Кафедра:" %}</strong> {{ profile.department.name }}</p>
-                            {% endif %}
-                            <p><strong>{% trans "Учёная степень:" %}</strong> {{ profile.get_academic_degree_display }}</p>
-                            <p><strong>{% trans "Учёное звание:" %}</strong> {{ profile.get_academic_title_display }}</p>
-                            <p><strong>{% trans "Дата назначения:" %}</strong> {{ profile.appointment_date }}</p>
-                            {% if profile.term_end_date %}
-                                <p><strong>{% trans "Срок окончания полномочий:" %}</strong> {{ profile.term_end_date }}</p>
-                            {% endif %}
-                            <p><strong>{% trans "Преподавательская деятельность:" %}</strong> {% if profile.has_teaching_duties %}{% trans "Да" %}{% else %}{% trans "Нет" %}{% endif %}</p>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h5>{% trans "Настройки уведомлений" %}</h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="post" action="{% url 'accounts:profile_edit' %}">
-                            {% csrf_token %}
-                            <!-- {% with settings=user.notification_settings %} -->
-                            <div class="form-check form-switch mb-2">
-                                <input type="checkbox" class="form-check-input" id="id_email_notifications" name="email_notifications" {% if settings.email_notifications %}checked{% endif %}>
-                                <label class="form-check-label" for="id_email_notifications">{% trans "Email уведомления" %}</label>
-                            </div>
-                            <div class="form-check form-switch mb-2">
-                                <input type="checkbox" class="form-check-input" id="id_sms_notifications" name="sms_notifications" {% if settings.sms_notifications %}checked{% endif %}>
-                                <label class="form-check-label" for="id_sms_notifications">{% trans "SMS уведомления" %}</label>
-                            </div>
-                            <div class="form-check form-switch mb-2">
-                                <input type="checkbox" class="form-check-input" id="id_web_notifications" name="web_notifications" {% if settings.web_notifications %}checked{% endif %}>
-                                <label class="form-check-label" for="id_web_notifications">{% trans "Веб уведомления" %}</label>
-                            </div>
-                            <div class="form-check form-switch mb-2">
-                                <input type="checkbox" class="form-check-input" id="id_grades_notification" name="grades_notification" {% if settings.grades_notification %}checked{% endif %}>
-                                <label class="form-check-label" for="id_grades_notification">{% trans "Уведомления об оценках" %}</label>
-                            </div>
-                            <div class="form-check form-switch mb-2">
-                                <input type="checkbox" class="form-check-input" id="id_schedule_changes" name="schedule_changes" {% if settings.schedule_changes %}checked{% endif %}>
-                                <label class="form-check-label" for="id_schedule_changes">{% trans "Изменения расписания" %}</label>
-                            </div>
-                            <div class="form-check form-switch mb-2">
-                                <input type="checkbox" class="form-check-input" id="id_course_updates" name="course_updates" {% if settings.course_updates %}checked{% endif %}>
-                                <label class="form-check-label" for="id_course_updates">{% trans "Обновления курсов" %}</label>
-                            </div>
-                            <div class="form-check form-switch mb-2">
-                                <input type="checkbox" class="form-check-input" id="id_system_messages" name="system_messages" {% if settings.system_messages %}checked{% endif %}>
-                                <label class="form-check-label" for="id_system_messages">{% trans "Системные сообщения" %}</label>
-                            </div>
-                            <!-- {% endwith %} -->
-                            <button type="submit" class="btn btn-primary mt-3">{% trans "Сохранить настройки" %}</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block title %}EduPortal - Профиль пользователя{% endblock %}
+{% block content %}
+<!-- Хлебные крошки -->
+<div class="breadcrumbs mb-4">
+    <a href="index.html">Главная</a>
+    <i class="fas fa-chevron-right mx-2 text-muted"></i>
+    <span class="current-page">Профиль</span>
+  </div>
+  
+  <!-- Заголовок и элементы управления -->
+  <div class="profile-header mb-4">
+    <h1 class="page-title">Профиль пользователя</h1>
+    
+    <div class="profile-actions">
+      <a href="{% url 'accounts:profile_edit' %}" class="btn btn-outline">
+        <i class="fas fa-edit"></i> Редактировать профиль
+      </a>
+      <button class="btn btn-outline">
+        <i class="fas fa-print"></i> Печать
+      </button>
+      <button class="btn btn-primary">
+        <i class="fas fa-download"></i> Экспорт данных
+      </button>
     </div>
-</body>
-</html>
+  </div>
+  
+  <!-- Профиль карточка -->
+  <div class="profile-card">
+    <div class="profile-cover">
+      <div class="profile-avatar-wrapper">
+        {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="profile-avatar" style="max-width: 100%;">
+        {% else %}
+            <div class="profile-placeholder mb-3">
+                <i class="fas fa-user-circle fa-5x"></i>
+            </div>
+        {% endif %}
+      </div>
+      
+      <div class="profile-top-actions">
+        <button class="btn btn-outline btn-sm" style="background-color: rgba(255, 255, 255, 0.8);">
+          <i class="fas fa-camera"></i> Изменить обложку
+        </button>
+      </div>
+    </div>
+    <div class="profile-main">
+      <h2 class="profile-name">{{ user.get_full_name }}</h2>
+      <div class="profile-role">{{ user.get_role_display }}</div>
+      
+      <div class="profile-section">
+        <div class="info-list">
+        {% if user.role == 'admin' and profile %}
+        <div class="info-item">
+            <div class="info-label">{% trans "Должность:" %}</div>
+            <div class="info-value">{{ profile.position }}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">{% trans "Уровень доступа:" %}</div>
+            <div class="info-value">{{ profile.get_access_level_display }}</div>
+          </div>                
+        {% comment %} {% endif %} {% endcomment %}
+        {% elif user.role == 'teacher' and profile %}
+          <div class="info-item">
+              <div class="info-label">{% trans "Должность:" %}</div>
+              <div class="info-value">{{ profile.get_position_display }}</div>
+            </div>   
+            <div class="info-item">
+              <div class="info-label">{% trans "Кафедра:" %}</div>
+              <div class="info-value">{{ profile.department.name }}</div>
+            </div>   
+            <div class="info-item">
+              <div class="info-label">{% trans "Учёная степень:" %}</div>
+              <div class="info-value">{{ profile.get_academic_degree_display  }}</div>
+            </div>   
+            <div class="info-item">
+              <div class="info-label">{% trans "Учёное звание:" %}</div>
+              <div class="info-value">{{ profile.get_academic_title_display }}</div>
+            </div>   
+            <div class="info-item">
+              <div class="info-label">{% trans "Тип занятости:" %}</div>
+              <div class="info-value">{{ profile.get_employment_type_display  }}</div>
+            </div> 
+            {% if profile.specialization %}
+              <div class="info-item">
+                <div class="info-label">{% trans "Специализация:" %}</div>
+                <div class="info-value">{{ profile.specialization }}</div>
+              </div> 
+            {% endif %}
+            {% if profile.office_location %}
+            <div class="info-item">
+              <div class="info-label">{% trans "Расположение кабинета:" %}</div>
+              <div class="info-value">{{ profile.office_location }}</div>
+            </div> 
+            {% endif %}
+            {% if profile.office_hours %}
+            <div class="info-item">
+              <div class="info-label">{% trans "Часы консультаций:" %}</div>
+              <div class="info-value">{{ profile.office_hours }}</div>
+            </div> 
+            {% endif %} 
+          {% elif user.role == 'student' and profile %}
+          <div class="info-item">
+              <div class="info-label">{% trans "Факультет:" %}</div>
+              <div class="info-value">{{ profile.office_hours }}</div>
+            </div> 
+            <div class="info-item">
+              <div class="info-label">{% trans "Направление:" %}</div>
+              <div class="info-value">{{ profile.office_hours }}</div>
+            </div> 
+            <div class="info-item">
+              <div class="info-label">{% trans "Группа:" %}</div>
+              <div class="info-value">{{ profile.group.name }}</div>
+            </div> 
+            <div class="info-item">
+              <div class="info-label">{% trans "Номер студенческого:" %}</div>
+              <div class="info-value">{{ profile.student_id  }}</div>
+            </div> 
+            <div class="info-item">
+              <div class="info-label">{% trans "Форма обучения:" %}</div>
+              <div class="info-value">{{ profile.get_education_form_display }}</div>
+            </div> 
+            <div class="info-item">
+              <div class="info-label">{% trans "Основа обучения:" %}</div>
+              <div class="info-value">{{ profile.get_education_basis_display  }}</div>
+            </div> 
+            <div class="info-item">
+              <div class="info-label">{% trans "Год поступления:" %}</div>
+              <div class="info-value">{{ profile.enrollment_year }}</div>
+            </div> 
+            <div class="info-item">
+              <div class="info-label">{% trans "Текущий семестр:" %}</div>
+              <div class="info-value">{{ profile.current_semester }}</div>
+            </div> 
+            <div class="info-item">
+              <div class="info-label">{% trans "Статус:" %}</div>
+              <div class="info-value">{{ profile.get_academic_status_display }}</div>
+            </div> 
+            <div class="info-item">
+              <div class="info-label">{% trans "Стипендия:" %}</div>
+              <div class="info-value">{{ profile.get_scholarship_status_display  }}</div>
+            </div> 
+            <div class="info-item">
+              <div class="info-label">{% trans "Проживает в общижитие:" %}</div>
+              <div class="info-value">{{ profile.has_dormitory  }}</div>
+            </div> 
+            
+          {% elif user.role == 'dean' and profile %}
+        
+            <div class="info-item">
+                <div class="info-label">{% trans "Должность:" %}</div>
+                <div class="info-value">{{ profile.get_position_display  }}</div>
+              </div> 
+
+            {% if profile.faculty  %}
+            <div class="info-item">
+              <div class="info-label">{% trans "Факультет:" %}</div>
+              <div class="info-value">{{ profile.faculty.name  }}</div>
+            </div> 
+            {% endif %} 
+
+            {% if profile.department  %}
+              <div class="info-item">
+                <div class="info-label">{% trans "Кафедра:" %}</div>
+                <div class="info-value">{{ profile.department.name  }}</div>
+              </div> 
+            {% endif %} 
+
+            <div class="info-item">
+              <div class="info-label">{% trans "Учёная степень:" %}</div>
+              <div class="info-value">{{ profile.get_academic_degree_display  }}</div>
+            </div>   
+            <div class="info-item">
+              <div class="info-label">{% trans "Учёное звание:" %}</div>
+              <div class="info-value">{{ profile.get_academic_title_display }}</div>
+            </div>   
+
+            
+
+            <div class="info-item">
+              <div class="info-label">{% trans "Дата назначения:" %}</div>
+              <div class="info-value">{{ profile.appointment_date   }}</div>
+            </div>
+
+            {% if profile.term_end_date  %}
+            <div class="info-item">
+              <div class="info-label">{% trans "Срок окончания полномочий:" %}</div>
+              <div class="info-value">{{ profile.term_end_date }}</div>
+            </div> 
+            {% endif %} 
+
+            <div class="info-item">
+              <div class="info-label">{% trans "Преподавательская деятельность:" %}</div>
+              <div class="info-value">{% if profile.has_teaching_duties %}{% trans "Да" %}{% else %}{% trans "Нет" %}{% endif %}</div>
+            </div>
+          {% endif %}
+                     
+          
+          
+          <div class="info-item">
+            <div class="info-label">{% trans "Email:" %}</div>
+            <div class="info-value">{% if user.email %}{{ user.email }}{% else %}Отсутствует информация{% endif %}</div>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-label">{% trans "Телефон:" %}</div>
+            <div class="info-value">{% if user.phone %}{{ user.phone }}{% else %}Отсутствует информация{% endif %}</div>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-label">{% trans "Дата рождения" %}</div>
+            <div class="info-value">{% if user.date_of_birth %}{{ user.date_of_birth }}{% else %}Отсутствует информация{% endif %}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Статистика -->
+  <div class="profile-stats mb-4">
+    <div class="stat-card">
+      <div class="stat-value average-grade">4.2</div>
+      <div class="stat-label">Средний балл</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-value attendance-rate">94%</div>
+      <div class="stat-label">Посещаемость</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-value completed-tasks">18/20</div>
+      <div class="stat-label">Выполнено заданий</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-value ranking">5/25</div>
+      <div class="stat-label">Место в рейтинге</div>
+    </div>
+  </div>
+  
+  <!-- Вкладки профиля -->
+  <div class="profile-tabs">
+    <div class="profile-tab active" data-tab="info">Информация</div>
+    <div class="profile-tab" data-tab="activity">Активность</div>
+    <div class="profile-tab" data-tab="achievements">Достижения</div>
+    <div class="profile-tab" data-tab="courses">Курсы</div>
+  </div>
+  
+  <!-- Секция Информация -->
+  <div class="profile-tab-content" id="info-content">
+  {% if user.role == 'admin' and profile and profile.responsibility_area %}
+      <!-- О себе -->
+      <div class="profile-section">
+        <h3 class="profile-section-title">
+          <i class="fas fa-user"></i> {% trans "Область ответственности:" %}
+        </h3>
+        <p>{{ profile.responsibility_area }}</p>
+      </div>
+    {% elif user.role == 'teacher' and profile and profile.bio %}
+      <!-- О себе -->
+      <div class="profile-section">
+        <h3 class="profile-section-title">
+          <i class="fas fa-user"></i> {% trans "Биография:" %}
+        </h3>
+        <p>{{ profile.bio }}</p>
+      </div>
+    {% elif user.role == 'student' and profile and profile.personal_info %}
+      <!-- О себе -->
+      <div class="profile-section">
+        <h3 class="profile-section-title">
+          <i class="fas fa-user"></i> {% trans "Дополнительная информация:" %}
+        </h3>
+        <p>{{ profile.personal_info }}</p>
+      </div>
+    {% elif user.role == 'student' and profile and profile.personal_info %}
+      <!-- О себе -->
+      <div class="profile-section">
+        <h3 class="profile-section-title">
+          <i class="fas fa-user"></i> {% trans "Дополнительная информация:" %}
+        </h3>
+        <p>{{ profile.personal_info }}</p>
+      </div>
+    {% elif user.role == 'methodist' and profile %}
+      <!-- О себе -->
+      <div class="profile-section">
+        <h3 class="profile-section-title">
+          <i class="fas fa-user"></i> {% trans "Обязанности:" %}
+        </h3>
+        <p>{{ profile.responsibilities  }}</p>
+        {% if profile.managed_groups.all %}
+          <h3 class="profile-section-title">
+            <i class="fas fa-user"></i> {% trans "Обязанности:" %}
+          </h3>
+           <ul>
+              {% for group in profile.managed_groups.all %}
+                  <li>{{ group.name }}</li>
+              {% endfor %}
+          </ul>     
+        {% endif %}
+      </div>
+    {% endif %}
+    
+    <!-- Навыки -->
+    <div class="profile-section">
+      <h3 class="profile-section-title">
+        <i class="fas fa-code"></i> Навыки
+      </h3>
+      
+      <div class="skills-grid">
+        <div class="skill-item">
+          <div class="skill-header">
+            <div class="skill-name">Java</div>
+            <div class="skill-level">80%</div>
+          </div>
+          <div class="skill-bar">
+            <div class="skill-fill" style="width: 80%"></div>
+          </div>
+        </div>
+        
+        <div class="skill-item">
+          <div class="skill-header">
+            <div class="skill-name">Python</div>
+            <div class="skill-level">70%</div>
+          </div>
+          <div class="skill-bar">
+            <div class="skill-fill" style="width: 70%"></div>
+          </div>
+        </div>
+        
+        <div class="skill-item">
+          <div class="skill-header">
+            <div class="skill-name">SQL</div>
+            <div class="skill-level">65%</div>
+          </div>
+          <div class="skill-bar">
+            <div class="skill-fill" style="width: 65%"></div>
+          </div>
+        </div>
+        
+        <div class="skill-item">
+          <div class="skill-header">
+            <div class="skill-name">HTML/CSS</div>
+            <div class="skill-level">85%</div>
+          </div>
+          <div class="skill-bar">
+            <div class="skill-fill" style="width: 85%"></div>
+          </div>
+        </div>
+        
+        <div class="skill-item">
+          <div class="skill-header">
+            <div class="skill-name">JavaScript</div>
+            <div class="skill-level">60%</div>
+          </div>
+          <div class="skill-bar">
+            <div class="skill-fill" style="width: 60%"></div>
+          </div>
+        </div>
+        
+        <div class="skill-item">
+          <div class="skill-header">
+            <div class="skill-name">Git</div>
+            <div class="skill-level">75%</div>
+          </div>
+          <div class="skill-bar">
+            <div class="skill-fill" style="width: 75%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Сертификаты и значки -->
+    <div class="profile-section">
+      <h3 class="profile-section-title">
+        <i class="fas fa-certificate"></i> Сертификаты и значки
+      </h3>
+      
+      <div class="badge-list">
+        <div class="badge-card">
+          <img src="https://via.placeholder.com/50" alt="Значок" class="badge-icon">
+          <div class="badge-name">Java Basic</div>
+        </div>
+        
+        <div class="badge-card">
+          <img src="https://via.placeholder.com/50" alt="Значок" class="badge-icon">
+          <div class="badge-name">Python</div>
+        </div>
+        
+        <div class="badge-card">
+          <img src="https://via.placeholder.com/50" alt="Значок" class="badge-icon">
+          <div class="badge-name">Web Dev</div>
+        </div>
+        
+        <div class="badge-card">
+          <img src="https://via.placeholder.com/50" alt="Значок" class="badge-icon">
+          <div class="badge-name">SQL</div>
+        </div>
+        
+        <div class="badge-card">
+          <img src="https://via.placeholder.com/50" alt="Значок" class="badge-icon">
+          <div class="badge-name">Algorithm</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Секция Активность (скрыта по умолчанию) -->
+  <div class="profile-tab-content" id="activity-content" style="display: none;">
+    <div class="activity-timeline">
+      <div class="activity-item">
+        <div class="activity-point"></div>
+        <div class="activity-time">2 часа назад</div>
+        <div class="activity-content">
+          <div class="activity-title">Выполнено задание</div>
+          <div class="activity-details">Лабораторная работа №5 по программированию</div>
+        </div>
+      </div>
+      
+      <div class="activity-item">
+        <div class="activity-point"></div>
+        <div class="activity-time">Вчера, 15:30</div>
+        <div class="activity-content">
+          <div class="activity-title">Получена оценка</div>
+          <div class="activity-details">5 баллов за контрольную работу по математике</div>
+        </div>
+      </div>
+      
+      <div class="activity-item">
+        <div class="activity-point"></div>
+        <div class="activity-time">Вчера, 10:15</div>
+        <div class="activity-content">
+          <div class="activity-title">Посещена лекция</div>
+          <div class="activity-details">Лекция по высшей математике</div>
+        </div>
+      </div>
+      
+      <div class="activity-item">
+        <div class="activity-point"></div>
+        <div class="activity-time">02.05.2025, 14:00</div>
+        <div class="activity-content">
+          <div class="activity-title">Получен сертификат</div>
+          <div class="activity-details">Java Basic - завершен онлайн-курс</div>
+        </div>
+      </div>
+      
+      <div class="activity-item">
+        <div class="activity-point"></div>
+        <div class="activity-time">30.04.2025, 11:30</div>
+        <div class="activity-content">
+          <div class="activity-title">Загружен материал</div>
+          <div class="activity-details">Презентация проекта по программированию</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Секция Достижения (скрыта по умолчанию) -->
+  <div class="profile-tab-content" id="achievements-content" style="display: none;">
+    <div class="achievement-list">
+      <div class="achievement-card">
+        <div class="achievement-icon">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <div class="achievement-title">Отличник</div>
+        <div class="achievement-desc">Получить средний балл выше 4.5 за семестр</div>
+        <div class="achievement-date">Получено: 15.01.2025</div>
+      </div>
+      
+      <div class="achievement-card">
+        <div class="achievement-icon">
+          <i class="fas fa-code"></i>
+        </div>
+        <div class="achievement-title">Программист</div>
+        <div class="achievement-desc">Выполнить все лабораторные работы по программированию на отлично</div>
+        <div class="achievement-date">Получено: 20.12.2024</div>
+      </div>
+      
+      <div class="achievement-card">
+        <div class="achievement-icon">
+          <i class="fas fa-project-diagram"></i>
+        </div>
+        <div class="achievement-title">Проектный менеджер</div>
+        <div class="achievement-desc">Успешно завершить групповой проект в качестве лидера</div>
+        <div class="achievement-date">Получено: 10.11.2024</div>
+      </div>
+      
+      <div class="achievement-card">
+        <div class="achievement-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="achievement-title">Пунктуальность</div>
+        <div class="achievement-desc">Посетить все занятия в течение месяца</div>
+        <div class="achievement-date">Получено: 30.10.2024</div>
+      </div>
+      
+      <div class="achievement-card">
+        <div class="achievement-icon">
+          <i class="fas fa-book"></i>
+        </div>
+        <div class="achievement-title">Эрудит</div>
+        <div class="achievement-desc">Получить высший балл за итоговый тест по теоретическим дисциплинам</div>
+        <div class="achievement-date">Получено: 15.10.2024</div>
+      </div>
+      
+      <div class="achievement-card">
+        <div class="achievement-icon">
+          <i class="fas fa-laptop-code"></i>
+        </div>
+        <div class="achievement-title">Разработчик</div>
+        <div class="achievement-desc">Создать и представить собственное веб-приложение</div>
+        <div class="achievement-date">Получено: 05.10.2024</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Секция Курсы (скрыта по умолчанию) -->
+  <div class="profile-tab-content" id="courses-content" style="display: none;">
+    <div class="courses-grid">
+      <div class="course-card">
+        <div class="course-image" style="background-image: url('https://via.placeholder.com/300x150')"></div>
+        <div class="course-content">
+          <div class="course-title">Алгоритмы и структуры данных</div>
+          <div class="course-desc">Изучение основных алгоритмов и структур данных для эффективного программирования.</div>
+          <div class="course-meta">
+            <div class="course-progress">
+              <div class="progress-bar-sm">
+                <div class="progress-fill-sm" style="width: 85%"></div>
+              </div>
+              <span>85%</span>
+            </div>
+            <div class="course-instructor">Сидорова С.С.</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="course-card">
+        <div class="course-image" style="background-image: url('https://via.placeholder.com/300x150')"></div>
+        <div class="course-content">
+          <div class="course-title">Базы данных</div>
+          <div class="course-desc">Проектирование, реализация и использование баз данных в приложениях.</div>
+          <div class="course-meta">
+            <div class="course-progress">
+              <div class="progress-bar-sm">
+                <div class="progress-fill-sm" style="width: 65%"></div>
+              </div>
+              <span>65%</span>
+            </div>
+            <div class="course-instructor">Смирнов С.С.</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="course-card">
+        <div class="course-image" style="background-image: url('https://via.placeholder.com/300x150')"></div>
+        <div class="course-content">
+          <div class="course-title">Web-разработка</div>
+          <div class="course-desc">Создание современных веб-приложений с использованием HTML, CSS, JavaScript.</div>
+          <div class="course-meta">
+            <div class="course-progress">
+              <div class="progress-bar-sm">
+                <div class="progress-fill-sm" style="width: 95%"></div>
+              </div>
+              <span>95%</span>
+            </div>
+            <div class="course-instructor">Козлов К.К.</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="course-card">
+        <div class="course-image" style="background-image: url('https://via.placeholder.com/300x150')"></div>
+        <div class="course-content">
+          <div class="course-title">Java программирование</div>
+          <div class="course-desc">Углубленное изучение Java для разработки корпоративных приложений.</div>
+          <div class="course-meta">
+            <div class="course-progress">
+              <div class="progress-bar-sm">
+                <div class="progress-fill-sm" style="width: 75%"></div>
+              </div>
+              <span>75%</span>
+            </div>
+            <div class="course-instructor">Сидорова С.С.</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="course-card">
+        <div class="course-image" style="background-image: url('https://via.placeholder.com/300x150')"></div>
+        <div class="course-content">
+          <div class="course-title">Искусственный интеллект</div>
+          <div class="course-desc">Введение в искусственный интеллект и машинное обучение.</div>
+          <div class="course-meta">
+            <div class="course-progress">
+              <div class="progress-bar-sm">
+                <div class="progress-fill-sm" style="width: 50%"></div>
+              </div>
+              <span>50%</span>
+            </div>
+            <div class="course-instructor">Петров П.П.</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="course-card">
+        <div class="course-image" style="background-image: url('https://via.placeholder.com/300x150')"></div>
+        <div class="course-content">
+          <div class="course-title">Мобильная разработка</div>
+          <div class="course-desc">Создание приложений для мобильных устройств на Android и iOS.</div>
+          <div class="course-meta">
+            <div class="course-progress">
+              <div class="progress-bar-sm">
+                <div class="progress-fill-sm" style="width: 40%"></div>
+              </div>
+              <span>40%</span>
+            </div>
+            <div class="course-instructor">Иванова И.И.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

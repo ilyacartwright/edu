@@ -87,9 +87,9 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'  # Требуется подтвержден
 ACCOUNT_USERNAME_REQUIRED = True  # Username обязателен
 ACCOUNT_UNIQUE_EMAIL = True  # Email должен быть уникальным
 ACCOUNT_LOGOUT_ON_GET = False  # Выход по GET запросу запрещен (требуется POST)
-ACCOUNT_LOGOUT_REDIRECT_URL = '/account/login/'  # URL после выхода
+ACCOUNT_LOGOUT_REDIRECT_URL = 'accounts:account_login'  # URL после выхода
 LOGIN_REDIRECT_URL = '/'  # URL после входа
-LOGIN_URL = '/account/login/'  # URL для входа
+LOGIN_URL = 'accounts:account_login'  # URL для входа
 ACCOUNT_ALLOW_REGISTRATION = False
 
 

@@ -1,3 +1,178 @@
-{% block title %}{% endblock %}
+{% load static %}
 
-{% block content %}{% endblock %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% endblock %}</title>
+  <!-- Подключение шрифтов -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600&family=Roboto+Mono&display=swap" rel="stylesheet">
+  <!-- Подключение Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Подключение стилей -->
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <!-- Дополнительные стили -->
+  {% block style %}{% endblock %}
+
+  
+</head>
+<body>
+  <!-- Верхнее меню -->
+  <nav class="navbar">
+    <div class="navbar-container container">
+      <a href="index.html" class="navbar-logo">EduPortal</a>
+      
+      <!-- Мобильное меню -->
+      <div class="mobile-menu-toggle" id="mobile-menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      
+      <!-- Основное меню -->
+      <div class="navbar-menu" id="navbar-menu">
+        <div class="mobile-menu-close" id="mobile-menu-close">
+          <i class="fas fa-times"></i>
+        </div>
+        <a href="schedule.html" class="navbar-link">Расписание</a>
+        <a href="journal.html" class="navbar-link">Журнал</a>
+        <a href="grades.html" class="navbar-link">Зачетная книга</a>
+        <a href="reports.html" class="navbar-link">Отчеты</a>
+        <a href="homework.html" class="navbar-link">Домашние задания</a>
+        <a href="messages.html" class="navbar-link">Сообщения</a>
+        <a href="materials.html" class="navbar-link">Учебные материалы</a>
+        
+        <!-- Выпадающее меню пользователя -->
+        <div class="dropdown">
+          <button class="btn btn-outline dropdown-toggle">
+            <i class="fas fa-user"></i>
+            <span>Профиль</span>
+          </button>
+          <div class="dropdown-menu">
+            <a href="{% url 'accounts:profile' %}" class="dropdown-item active">
+              <i class="fas fa-user-circle"></i> Мой профиль
+            </a>
+            <a href="settings.html" class="dropdown-item">
+              <i class="fas fa-cog"></i> Настройки
+            </a>
+            <a href="help.html" class="dropdown-item">
+              <i class="fas fa-question-circle"></i> Помощь
+            </a>
+            <a href="login.html" class="dropdown-item">
+              <i class="fas fa-sign-out-alt"></i> Выйти
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Основной контент -->
+  <main class="main-content">
+    <div class="container">
+    {% block content %}{% endblock %}
+      
+    </div>
+  </main>
+  
+  <!-- Подвал сайта -->
+  <!-- <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <h3>EduPortal</h3>
+          <p>Образовательная платформа</p>
+        </div>
+        <div class="footer-links">
+          <div class="footer-links-group">
+            <h5>Навигация</h5>
+            <ul>
+              <li><a href="index.html">Главная</a></li>
+              <li><a href="schedule.html">Расписание</a></li>
+              <li><a href="journal.html">Журнал</a></li>
+              <li><a href="materials.html">Учебные материалы</a></li>
+            </ul>
+          </div>
+          <div class="footer-links-group">
+            <h5>Поддержка</h5>
+            <ul>
+              <li><a href="help.html">Помощь</a></li>
+              <li><a href="contact.html">Контакты</a></li>
+              <li><a href="faq.html">FAQ</a></li>
+            </ul>
+          </div>
+          <div class="footer-links-group">
+            <h5>Правовая информация</h5>
+            <ul>
+              <li><a href="terms.html">Условия использования</a></li>
+              <li><a href="privacy.html">Политика конфиденциальности</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 EduPortal. Все права защищены.</p>
+        <div class="social-links">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-telegram"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer> -->
+  
+  <!-- JavaScript -->
+  <script>
+    // Мобильное меню
+    const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
+    const navbarMenu = document.getElementById('navbar-menu');
+    
+    if (mobileMenuToggle) {
+      mobileMenuToggle.addEventListener('click', () => {
+        navbarMenu.classList.add('active');
+      });
+    }
+    
+    if (mobileMenuClose) {
+      mobileMenuClose.addEventListener('click', () => {
+        navbarMenu.classList.remove('active');
+      });
+    }
+    
+    // Переключение вкладок
+    const profileTabs = document.querySelectorAll('.profile-tab');
+    const tabContents = document.querySelectorAll('.profile-tab-content');
+    
+    profileTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Удаляем активный класс у всех вкладок
+        profileTabs.forEach(t => t.classList.remove('active'));
+        
+        // Добавляем активный класс текущей вкладке
+        tab.classList.add('active');
+        
+        // Скрываем все содержимое вкладок
+        tabContents.forEach(content => {
+          content.style.display = 'none';
+        });
+        
+        // Показываем содержимое выбранной вкладки
+        const tabId = tab.getAttribute('data-tab');
+        const selectedContent = document.getElementById(`${tabId}-content`);
+        if (selectedContent) {
+          selectedContent.style.display = 'block';
+        }
+      });
+    });
+    
+    // Печать профиля
+    document.querySelector('.btn-print').addEventListener('click', () => {
+      window.print();
+    });
+  </script>
+</body>
+</html>

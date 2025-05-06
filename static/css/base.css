@@ -58,6 +58,11 @@
     color: var(--primary-dark);
   }
   
+.navbar-link{
+
+  text-align: center;
+}
+
   button, .btn {
     display: inline-flex;
     align-items: center;
@@ -210,6 +215,7 @@
   .navbar-menu a {
     font-weight: 500;
     position: relative;
+    text-align: center;
   }
   
   .navbar-menu a.active:after {
