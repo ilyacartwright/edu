@@ -141,9 +141,9 @@
                         <h5>{% trans "Настройки уведомлений" %}</h5>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="{% url 'accounts:notification_settings' %}">
+                        <form method="post" action="{% url 'accounts:profile_edit' %}">
                             {% csrf_token %}
-                            {% with settings=user.notification_settings %}
+                            <!-- {% with settings=user.notification_settings %} -->
                             <div class="form-check form-switch mb-2">
                                 <input type="checkbox" class="form-check-input" id="id_email_notifications" name="email_notifications" {% if settings.email_notifications %}checked{% endif %}>
                                 <label class="form-check-label" for="id_email_notifications">{% trans "Email уведомления" %}</label>
@@ -172,7 +172,7 @@
                                 <input type="checkbox" class="form-check-input" id="id_system_messages" name="system_messages" {% if settings.system_messages %}checked{% endif %}>
                                 <label class="form-check-label" for="id_system_messages">{% trans "Системные сообщения" %}</label>
                             </div>
-                            {% endwith %}
+                            <!-- {% endwith %} -->
                             <button type="submit" class="btn btn-primary mt-3">{% trans "Сохранить настройки" %}</button>
                         </form>
                     </div>

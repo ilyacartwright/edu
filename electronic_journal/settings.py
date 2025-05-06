@@ -79,6 +79,38 @@ INSTALLED_APPS = [
 # Настройка пользовательской модели
 AUTH_USER_MODEL = 'accounts.User'
 
+# Настройки для django-allauth
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'  # Аутентификация через email или username
+ACCOUNT_EMAIL_REQUIRED = True  # Email обязателен
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # Требуется подтверждение email
+ACCOUNT_USERNAME_REQUIRED = True  # Username обязателен
+ACCOUNT_UNIQUE_EMAIL = True  # Email должен быть уникальным
+ACCOUNT_LOGOUT_ON_GET = False  # Выход по GET запросу запрещен (требуется POST)
+ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login/'  # URL после выхода
+LOGIN_REDIRECT_URL = '/'  # URL после входа
+LOGIN_URL = '/accounts/login/'  # URL для входа
+ACCOUNT_ALLOW_REGISTRATION = False
+
+
+
+# Дополнительные настройки безопасности
+PASSWORD_RESET_TIMEOUT_DAYS = 1  # Срок действия ссылки для восстановления пароля в днях
+SESSION_COOKIE_AGE = 86400  # Срок действия сессии в секундах (1 день)
+SESSION_COOKIE_SECURE = not DEBUG  # Использовать secure cookie в production
+CSRF_COOKIE_SECURE = not DEBUG  # Использовать secure cookie для CSRF в production
+
+# Настройки для email
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Для разработки
+# В production следует использовать реальный email бэкенд:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'your-smtp-server.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'your-email@example.com'
+# EMAIL_HOST_PASSWORD = 'your-password'
+# DEFAULT_FROM_EMAIL = 'noreply@yourdomain.com'
+
+
 # Настройка аутентификации
 AUTHENTICATION_BACKENDS = [
     # Django стандартный бэкенд
@@ -139,7 +171,11 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'allauth.account.middleware.AccountMiddleware'
+    'allauth.account.middleware.AccountMiddleware',
+
+    # 
+    'accounts.middleware.UserSessionMiddleware',
+
 ]
 
 ROOT_URLCONF = "electronic_journal.urls"
