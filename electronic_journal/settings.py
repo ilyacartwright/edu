@@ -147,7 +147,7 @@ ROOT_URLCONF = "electronic_journal.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -196,13 +196,14 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_TZ = True
+LANGUAGE_CODE = "ru"
+TIME_ZONE = "Europe/Kaliningrad"
+USE_TZ    = True
 
 
 # Static files (CSS, JavaScript, Images)

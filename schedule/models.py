@@ -6,33 +6,6 @@ from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 import datetime
 
-
-class TimeSlot(models.Model):
-    """
-    Модель временного слота для занятий
-    """
-    number = models.PositiveSmallIntegerField(_('Номер пары'))
-    start_time = models.TimeField(_('Время начала'))
-    end_time = models.TimeField(_('Время окончания'))
-    break_after = models.PositiveSmallIntegerField(_('Перерыв после (мин)'), default=10)
-    
-    class Meta:
-        verbose_name = _('временной слот')
-        verbose_name_plural = _('временные слоты')
-        ordering = ['number']
-    
-    def __str__(self):
-        return f"{self.number} пара ({self.start_time.strftime('%H:%M')}-{self.end_time.strftime('%H:%M')})"
-    
-    def clean(self):
-        """Проверка корректности времени начала и окончания"""
-        if self.start_time and self.end_time and self.start_time >= self.end_time:
-            from django.db import models
-from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
-from django.utils import timezone
-import datetime
-
 class TimeSlot(models.Model):
     """
     Модель временного слота для занятий
