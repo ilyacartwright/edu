@@ -23,7 +23,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
+    path('', include('site_settings.urls', namespace='site_settings')),
     # Включаем allauth без namespace
     path('accounts/signup/', RedirectView.as_view(pattern_name='account_login'), name='account_signup'),
     path('accounts/', include('allauth.urls')),

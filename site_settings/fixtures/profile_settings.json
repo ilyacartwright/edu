@@ -1,0 +1,97 @@
+[
+  {
+    "model": "site_settings.sitesettings",
+    "pk": 1,
+    "fields": {
+      "site_name": "EduPortal",
+      "site_description": "Образовательная платформа для современного обучения студентов. Электронный журнал, расписание занятий и учебные материалы.",
+      "site_keywords": "электронный журнал, образование, вуз, университет, студент, преподаватель, обучение",
+      "footer_text": "EduPortal - электронная образовательная платформа для высших учебных заведений.",
+      "contact_email": "info@eduportal.example.com",
+      "contact_phone": "+7 (123) 456-78-90",
+      "primary_color": "#3498db",
+      "secondary_color": "#2ecc71",
+      "enable_caching": true,
+      "maintenance_mode": false,
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "site_settings.studentprofiledisplaysettings",
+    "pk": 1,
+    "fields": {
+      "show_faculty": true,
+      "show_specialization": true,
+      "show_group": true,
+      "show_student_id": true,
+      "show_education_form": true,
+      "show_education_basis": true,
+      "show_enrollment_year": true,
+      "show_current_semester": true,
+      "show_academic_status": true,
+      "show_scholarship_status": true,
+      "show_dormitory": true,
+      "show_personal_info": true,
+      "show_skills": true,
+      "show_certificates": true,
+      "show_achievements": true,
+      "show_courses": true,
+      "show_activity": true,
+      "show_statistics": true
+    }
+  },
+  {
+    "model": "site_settings.teacherprofiledisplaysettings",
+    "pk": 1,
+    "fields": {
+      "show_department": true,
+      "show_position": true,
+      "show_academic_degree": true,
+      "show_academic_title": true,
+      "show_employment_type": true,
+      "show_specialization": true,
+      "show_hire_date": true,
+      "show_office_location": true,
+      "show_office_hours": true,
+      "show_bio": true,
+      "show_courses": true,
+      "show_publications": true
+    }
+  },
+  {
+    "model": "site_settings.adminprofiledisplaysettings",
+    "pk": 1,
+    "fields": {
+      "show_position": true,
+      "show_department": true,
+      "show_access_level": true,
+      "show_responsibility_area": true
+    }
+  },
+  {
+    "model": "site_settings.methodistprofiledisplaysettings",
+    "pk": 1,
+    "fields": {
+      "show_department": true,
+      "show_employee_id": true,
+      "show_responsibilities": true,
+      "show_managed_specializations": true,
+      "show_managed_groups": true
+    }
+  },
+  {
+    "model": "site_settings.deanprofiledisplaysettings",
+    "pk": 1,
+    "fields": {
+      "show_position": true,
+      "show_faculty": true,
+      "show_department": true,
+      "show_academic_degree": true,
+      "show_academic_title": true,
+      "show_appointment_date": true,
+      "show_term_end_date": true,
+      "show_has_teaching_duties": true
+    }
+  }
+]

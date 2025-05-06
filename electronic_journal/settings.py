@@ -74,7 +74,9 @@ INSTALLED_APPS = [
     'messaging',
     'reports',
     'api',
-    'main'
+    'main',
+    'site_settings',
+
 ]
 
 # Настройка пользовательской модели
@@ -192,6 +194,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                'site_settings.context_processors.site_settings',
             ],
         },
     },

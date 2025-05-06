@@ -1,28 +1,54 @@
 {% load static %}
-
+{% load i18n %}
 
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}{% endblock %}</title>
+  <title>{% block title %}{{ site_settings.site_name }}{% endblock %}</title>
+  
+  <!-- Мета-данные сайта -->
+  <meta name="description" content="{{ site_settings.site_description }}">
+  <meta name="keywords" content="{{ site_settings.site_keywords }}">
+  
+  <!-- Favicon -->
+  {% if site_settings.site_favicon %}
+  <link rel="icon" type="image/x-icon" href="{{ site_settings.site_favicon.url }}">
+  {% else %}
+  <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+  {% endif %}
+  
   <!-- Подключение шрифтов -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600&family=Roboto+Mono&display=swap" rel="stylesheet">
   <!-- Подключение Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Подключение стилей -->
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  
+  <!-- Пользовательские стили CSS с цветами из настроек -->
+  <style>
+    :root {
+        --primary-color: {{ site_settings.primary_color }};
+        --secondary-color: {{ site_settings.secondary_color }};
+    }
+  </style>
+  
   <!-- Дополнительные стили -->
   {% block style %}{% endblock %}
-
-  
 </head>
 <body>
   <!-- Верхнее меню -->
   <nav class="navbar">
     <div class="navbar-container container">
-      <a href="index.html" class="navbar-logo">EduPortal</a>
+      <!-- Логотип -->
+      {% if site_settings.site_logo %}
+      <a href="{% url 'main' %}" class="navbar-logo">
+        <img src="{{ site_settings.site_logo.url }}" alt="{{ site_settings.site_name }}" class="logo-img">
+      </a>
+      {% else %}
+      <a href="{% url 'main' %}" class="navbar-logo">{{ site_settings.site_name }}</a>
+      {% endif %}
       
       <!-- Мобильное меню -->
       <div class="mobile-menu-toggle" id="mobile-menu-toggle">
@@ -45,6 +71,7 @@
         <a href="materials.html" class="navbar-link">Учебные материалы</a>
         
         <!-- Выпадающее меню пользователя -->
+        {% if user.is_authenticated %}
         <div class="dropdown">
           <button class="btn btn-outline dropdown-toggle">
             <i class="fas fa-user"></i>
@@ -54,17 +81,22 @@
             <a href="{% url 'accounts:profile' %}" class="dropdown-item active">
               <i class="fas fa-user-circle"></i> Мой профиль
             </a>
-            <a href="settings.html" class="dropdown-item">
+            <a href="{% url 'accounts:profile_edit' %}" class="dropdown-item">
               <i class="fas fa-cog"></i> Настройки
             </a>
             <a href="help.html" class="dropdown-item">
               <i class="fas fa-question-circle"></i> Помощь
             </a>
-            <a href="login.html" class="dropdown-item">
+            <a href="{% url 'accounts:account_logout' %}" class="dropdown-item">
               <i class="fas fa-sign-out-alt"></i> Выйти
             </a>
           </div>
         </div>
+        {% else %}
+        <a href="{% url 'accounts:account_login' %}" class="navbar-link">
+          <i class="fas fa-sign-in-alt"></i> Войти
+        </a>
+        {% endif %}
       </div>
     </div>
   </nav>
@@ -72,24 +104,37 @@
   <!-- Основной контент -->
   <main class="main-content">
     <div class="container">
-    {% block content %}{% endblock %}
+      {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
       
+      {% block content %}{% endblock %}
     </div>
   </main>
   
-  <!-- Подвал сайта -->
-  <!-- <footer class="footer">
+  {% comment %} <!-- Подвал сайта -->
+  <footer class="footer">
     <div class="container">
       <div class="footer-content">
         <div class="footer-logo">
-          <h3>EduPortal</h3>
-          <p>Образовательная платформа</p>
+          {% if site_settings.site_logo %}
+          <img src="{{ site_settings.site_logo.url }}" alt="{{ site_settings.site_name }}" class="footer-logo-img">
+          {% else %}
+          <h3>{{ site_settings.site_name }}</h3>
+          {% endif %}
+          <p>{{ site_settings.footer_text }}</p>
         </div>
         <div class="footer-links">
           <div class="footer-links-group">
             <h5>Навигация</h5>
             <ul>
-              <li><a href="index.html">Главная</a></li>
+              <li><a href="{% url 'main' %}">Главная</a></li>
               <li><a href="schedule.html">Расписание</a></li>
               <li><a href="journal.html">Журнал</a></li>
               <li><a href="materials.html">Учебные материалы</a></li>
@@ -113,16 +158,27 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2025 EduPortal. Все права защищены.</p>
+        <p>&copy; {{ now|date:"Y" }} {{ site_settings.site_name }}. Все права защищены.</p>
         <div class="social-links">
-          <a href="#"><i class="fab fa-facebook-f"></i></a>
-          <a href="#"><i class="fab fa-twitter"></i></a>
-          <a href="#"><i class="fab fa-instagram"></i></a>
-          <a href="#"><i class="fab fa-telegram"></i></a>
+          {% if site_settings.social_vk %}
+          <a href="{{ site_settings.social_vk }}" target="_blank"><i class="fab fa-vk"></i></a>
+          {% endif %}
+          
+          {% if site_settings.social_telegram %}
+          <a href="{{ site_settings.social_telegram }}" target="_blank"><i class="fab fa-telegram"></i></a>
+          {% endif %}
+          
+          {% if site_settings.social_instagram %}
+          <a href="{{ site_settings.social_instagram }}" target="_blank"><i class="fab fa-instagram"></i></a>
+          {% endif %}
+          
+          {% if site_settings.social_youtube %}
+          <a href="{{ site_settings.social_youtube }}" target="_blank"><i class="fab fa-youtube"></i></a>
+          {% endif %}
         </div>
       </div>
     </div>
-  </footer> -->
+  </footer> {% endcomment %}
   
   <!-- JavaScript -->
   <script>
@@ -169,10 +225,15 @@
       });
     });
     
-    // Печать профиля
-    document.querySelector('.btn-print').addEventListener('click', () => {
-      window.print();
-    });
+    // Проверка наличия кнопки печати
+    const printButton = document.querySelector('.btn-print');
+    if (printButton) {
+      printButton.addEventListener('click', () => {
+        window.print();
+      });
+    }
   </script>
+  
+  {% block scripts %}{% endblock %}
 </body>
 </html>

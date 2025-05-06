@@ -4,33 +4,81 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.shortcuts import redirect
 from django.urls import reverse
+from .utils import get_nested_field_value
 
 from .models import User, AdminProfile, TeacherProfile, StudentProfile, MethodistProfile, DeanProfile
 from .forms import ProfileEditForm, UserEditForm
 
 @login_required
 def profile_view(request):
-    """Представление для отображения профиля"""
+    """Представление для отображения профиля пользователя"""
     user = request.user
-
+    
     # Определение типа профиля
     profile = None
+    profile_settings = None
+    
     if user.role == 'admin' and hasattr(user, 'admin_profile'):
         profile = user.admin_profile
+        from site_settings.models import AdminProfileDisplaySettings
+        profile_settings = AdminProfileDisplaySettings.get_settings()
     elif user.role == 'teacher' and hasattr(user, 'teacher_profile'):
         profile = user.teacher_profile
+        from site_settings.models import TeacherProfileDisplaySettings
+        profile_settings = TeacherProfileDisplaySettings.get_settings()
     elif user.role == 'student' and hasattr(user, 'student_profile'):
         profile = user.student_profile
+        from site_settings.models import StudentProfileDisplaySettings
+        profile_settings = StudentProfileDisplaySettings.get_settings()
     elif user.role == 'methodist' and hasattr(user, 'methodist_profile'):
         profile = user.methodist_profile
+        from site_settings.models import MethodistProfileDisplaySettings
+        profile_settings = MethodistProfileDisplaySettings.get_settings()
     elif user.role == 'dean' and hasattr(user, 'dean_profile'):
         profile = user.dean_profile
-
+        from site_settings.models import DeanProfileDisplaySettings
+        profile_settings = DeanProfileDisplaySettings.get_settings()
+    
+    # Получаем конфигурацию полей и разделов
+    fields_config = {}
+    sections_config = {}
+    
+    if profile_settings:
+        fields_config = profile_settings.get_fields_config()
+        sections_config = profile_settings.get_sections_config()
+    
+    # Получаем значения полей
+    fields_values = {}
+    
+    for field_name, config in fields_config.items():
+        if config['visible']:
+            value = get_nested_field_value(profile, field_name)
+            if value is not None:
+                fields_values[field_name] = {
+                    'display_name': config['display_name'],
+                    'value': value,
+                    'is_choice': config.get('is_choice', False),
+                    'is_boolean': config.get('is_boolean', False)
+                }
+    
+    # Получаем значения разделов
+    sections_values = {}
+    
+    for section_name, config in sections_config.items():
+        if config['visible']:
+            value = get_nested_field_value(profile, section_name)
+            sections_values[section_name] = {
+                'display_name': config['display_name'],
+                'value': value
+            }
+    
     return render(request, 'account/profile.html', {
         'user': user,
         'profile': profile,
+        'profile_settings': profile_settings,
+        'fields_values': fields_values,
+        'sections_values': sections_values
     })
-
 
 @login_required
 def profile_edit_view(request):
