@@ -1,0 +1,184 @@
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>{% trans "Информация пользователя" %}</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="img-fluid rounded-circle mb-3" style="max-width: 150px;">
+                        {% else %}
+                            <div class="profile-placeholder mb-3">
+                                <i class="fas fa-user-circle fa-5x"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <h4>{{ user.get_full_name }}</h4>
+                        <p class="text-muted">{{ user.get_role_display }}</p>
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'accounts:profile_edit' %}" class="btn btn-primary">
+                                {% trans "Редактировать профиль" %}
+                            </a>
+                        </div>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>{% trans "Email:" %}</strong> {{ user.email }}
+                        </li>
+                        {% if user.phone_number %}
+                        <li class="list-group-item">
+                            <strong>{% trans "Телефон:" %}</strong> {{ user.phone_number }}
+                        </li>
+                        {% endif %}
+                        {% if user.date_of_birth %}
+                        <li class="list-group-item">
+                            <strong>{% trans "Дата рождения:" %}</strong> {{ user.date_of_birth }}
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>{% trans "Дополнительная информация" %}</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if user.role == 'admin' and profile %}
+                            <p><strong>{% trans "Должность:" %}</strong> {{ profile.position }}</p>
+                            <p><strong>{% trans "Уровень доступа:" %}</strong> {{ profile.get_access_level_display }}</p>
+                            {% if profile.responsibility_area %}
+                                <p><strong>{% trans "Область ответственности:" %}</strong> {{ profile.responsibility_area }}</p>
+                            {% endif %}
+                        {% elif user.role == 'teacher' and profile %}
+                            <p><strong>{% trans "Должность:" %}</strong> {{ profile.get_position_display }}</p>
+                            <p><strong>{% trans "Кафедра:" %}</strong> {{ profile.department.name }}</p>
+                            <p><strong>{% trans "Учёная степень:" %}</strong> {{ profile.get_academic_degree_display }}</p>
+                            <p><strong>{% trans "Учёное звание:" %}</strong> {{ profile.get_academic_title_display }}</p>
+                            <p><strong>{% trans "Тип занятости:" %}</strong> {{ profile.get_employment_type_display }}</p>
+                            {% if profile.specialization %}
+                                <p><strong>{% trans "Специализация:" %}</strong> {{ profile.specialization }}</p>
+                            {% endif %}
+                            {% if profile.office_location %}
+                                <p><strong>{% trans "Расположение кабинета:" %}</strong> {{ profile.office_location }}</p>
+                            {% endif %}
+                            {% if profile.office_hours %}
+                                <p><strong>{% trans "Часы консультаций:" %}</strong> {{ profile.office_hours }}</p>
+                            {% endif %}
+                            {% if profile.bio %}
+                                <div class="mt-3">
+                                    <h6>{% trans "Биография:" %}</h6>
+                                    <p>{{ profile.bio }}</p>
+                                </div>
+                            {% endif %}
+                        {% elif user.role == 'student' and profile %}
+                            <p><strong>{% trans "Группа:" %}</strong> {{ profile.group.name }}</p>
+                            <p><strong>{% trans "Номер студенческого:" %}</strong> {{ profile.student_id }}</p>
+                            <p><strong>{% trans "Форма обучения:" %}</strong> {{ profile.get_education_form_display }}</p>
+                            <p><strong>{% trans "Основа обучения:" %}</strong> {{ profile.get_education_basis_display }}</p>
+                            <p><strong>{% trans "Год поступления:" %}</strong> {{ profile.enrollment_year }}</p>
+                            <p><strong>{% trans "Текущий семестр:" %}</strong> {{ profile.current_semester }}</p>
+                            <p><strong>{% trans "Статус:" %}</strong> {{ profile.get_academic_status_display }}</p>
+                            <p><strong>{% trans "Стипендия:" %}</strong> {{ profile.get_scholarship_status_display }}</p>
+                            <p><strong>{% trans "Проживает в общежитии:" %}</strong> {% if profile.has_dormitory %}{% trans "Да" %}{% else %}{% trans "Нет" %}{% endif %}</p>
+                            {% if profile.personal_info %}
+                                <div class="mt-3">
+                                    <h6>{% trans "Дополнительная информация:" %}</h6>
+                                    <p>{{ profile.personal_info }}</p>
+                                </div>
+                            {% endif %}
+                        {% elif user.role == 'methodist' and profile %}
+                            <p><strong>{% trans "Кафедра:" %}</strong> {{ profile.department.name }}</p>
+                            <p><strong>{% trans "Табельный номер:" %}</strong> {{ profile.employee_id }}</p>
+                            <div class="mt-3">
+                                <h6>{% trans "Обязанности:" %}</h6>
+                                <p>{{ profile.responsibilities }}</p>
+                            </div>
+                            {% if profile.managed_groups.all %}
+                                <div class="mt-3">
+                                    <h6>{% trans "Курируемые группы:" %}</h6>
+                                    <ul>
+                                        {% for group in profile.managed_groups.all %}
+                                            <li>{{ group.name }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        {% elif user.role == 'dean' and profile %}
+                            <p><strong>{% trans "Должность:" %}</strong> {{ profile.get_position_display }}</p>
+                            {% if profile.faculty %}
+                                <p><strong>{% trans "Факультет:" %}</strong> {{ profile.faculty.name }}</p>
+                            {% endif %}
+                            {% if profile.department %}
+                                <p><strong>{% trans "Кафедра:" %}</strong> {{ profile.department.name }}</p>
+                            {% endif %}
+                            <p><strong>{% trans "Учёная степень:" %}</strong> {{ profile.get_academic_degree_display }}</p>
+                            <p><strong>{% trans "Учёное звание:" %}</strong> {{ profile.get_academic_title_display }}</p>
+                            <p><strong>{% trans "Дата назначения:" %}</strong> {{ profile.appointment_date }}</p>
+                            {% if profile.term_end_date %}
+                                <p><strong>{% trans "Срок окончания полномочий:" %}</strong> {{ profile.term_end_date }}</p>
+                            {% endif %}
+                            <p><strong>{% trans "Преподавательская деятельность:" %}</strong> {% if profile.has_teaching_duties %}{% trans "Да" %}{% else %}{% trans "Нет" %}{% endif %}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5>{% trans "Настройки уведомлений" %}</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'accounts:notification_settings' %}">
+                            {% csrf_token %}
+                            {% with settings=user.notification_settings %}
+                            <div class="form-check form-switch mb-2">
+                                <input type="checkbox" class="form-check-input" id="id_email_notifications" name="email_notifications" {% if settings.email_notifications %}checked{% endif %}>
+                                <label class="form-check-label" for="id_email_notifications">{% trans "Email уведомления" %}</label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input type="checkbox" class="form-check-input" id="id_sms_notifications" name="sms_notifications" {% if settings.sms_notifications %}checked{% endif %}>
+                                <label class="form-check-label" for="id_sms_notifications">{% trans "SMS уведомления" %}</label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input type="checkbox" class="form-check-input" id="id_web_notifications" name="web_notifications" {% if settings.web_notifications %}checked{% endif %}>
+                                <label class="form-check-label" for="id_web_notifications">{% trans "Веб уведомления" %}</label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input type="checkbox" class="form-check-input" id="id_grades_notification" name="grades_notification" {% if settings.grades_notification %}checked{% endif %}>
+                                <label class="form-check-label" for="id_grades_notification">{% trans "Уведомления об оценках" %}</label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input type="checkbox" class="form-check-input" id="id_schedule_changes" name="schedule_changes" {% if settings.schedule_changes %}checked{% endif %}>
+                                <label class="form-check-label" for="id_schedule_changes">{% trans "Изменения расписания" %}</label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input type="checkbox" class="form-check-input" id="id_course_updates" name="course_updates" {% if settings.course_updates %}checked{% endif %}>
+                                <label class="form-check-label" for="id_course_updates">{% trans "Обновления курсов" %}</label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input type="checkbox" class="form-check-input" id="id_system_messages" name="system_messages" {% if settings.system_messages %}checked{% endif %}>
+                                <label class="form-check-label" for="id_system_messages">{% trans "Системные сообщения" %}</label>
+                            </div>
+                            {% endwith %}
+                            <button type="submit" class="btn btn-primary mt-3">{% trans "Сохранить настройки" %}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
