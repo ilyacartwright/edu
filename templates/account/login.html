@@ -1,0 +1,92 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPortal - Авторизация</title>
+    <!-- Подключение шрифтов -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600&family=Roboto+Mono&display=swap"
+        rel="stylesheet">
+    <!-- Подключение Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Подключение стилей -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <!-- Стили для страницы авторизации -->
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-wrapper">
+            <div class="auth-card fade-in">
+                <div class="auth-logo">
+                    <img src="{% static 'img/logo.png' %}" alt="EduPortal Logo">
+                </div>
+
+                <h1 class="auth-title">Вход в систему</h1>
+                <p class="auth-subtitle">Введите данные для доступа к образовательной платформе</p>
+
+                <form id="loginForm" action="{% url 'account_login' %}" method="POST">
+                    {% csrf_token %}
+                    <!-- {{ form.as_p }} -->
+
+                    <div class="form-floating">
+                        <input type="text" class="input" id="id_login" name="login" placeholder=" " required>
+                        <label for="id_login">{% trans "Логин или Email" %}</label>
+                    </div>
+
+                    <div class="form-floating">
+                        <input type="password" class="input" id="id_password" name="password" placeholder=" " required>
+                        <label for="id_password">{% trans "Пароль" %}</label>
+                    </div>
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        {% for field in form %}
+                        {% for error in field.errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                        {% endfor %}
+
+                        {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="form-options">
+                        <div class="grid grid-2">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
+                                <label for="rememberMe" class="form-check-label">{% trans "Запомнить меня" %}</label>
+                            </div>
+
+                            <div class="forgot-password">
+                                <a href="{% url 'account_reset_password' %}">{% trans "Забыли пароль?" %}</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="next" value="{{ next }}">
+                    
+                    <button type="submit" class="auth-submit">
+                        {% trans "Войти" %} <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </form>
+
+            </div>
+
+            <div class="auth-help mt-4 text-center">
+                <a href="help.html" class="text-muted">
+                    <i class="fas fa-question-circle"></i> {% trans "Нужна помощь?" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

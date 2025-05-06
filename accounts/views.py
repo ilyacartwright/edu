@@ -26,7 +26,7 @@ def profile_view(request):
     elif user.role == 'dean' and hasattr(user, 'dean_profile'):
         profile = user.dean_profile
 
-    return render(request, 'accounts/profile.html', {
+    return render(request, 'account/profile.html', {
         'user': user,
         'profile': profile,
     })
@@ -65,7 +65,7 @@ def profile_edit_view(request):
         user_form = UserEditForm(instance=user)
         profile_form = ProfileEditForm(instance=profile, role=user.role)
 
-    return render(request, 'accounts/profile_edit.html', {
+    return render(request, 'account/profile_edit.html', {
         'user_form': user_form,
         'profile_form': profile_form,
     })

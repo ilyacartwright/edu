@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'messaging',
     'reports',
     'api',
+    'main'
 ]
 
 # Настройка пользовательской модели
@@ -82,13 +83,13 @@ AUTH_USER_MODEL = 'accounts.User'
 # Настройки для django-allauth
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'  # Аутентификация через email или username
 ACCOUNT_EMAIL_REQUIRED = True  # Email обязателен
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # Требуется подтверждение email
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # Требуется подтверждение email
 ACCOUNT_USERNAME_REQUIRED = True  # Username обязателен
 ACCOUNT_UNIQUE_EMAIL = True  # Email должен быть уникальным
 ACCOUNT_LOGOUT_ON_GET = False  # Выход по GET запросу запрещен (требуется POST)
-ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login/'  # URL после выхода
+ACCOUNT_LOGOUT_REDIRECT_URL = '/account/login/'  # URL после выхода
 LOGIN_REDIRECT_URL = '/'  # URL после входа
-LOGIN_URL = '/accounts/login/'  # URL для входа
+LOGIN_URL = '/account/login/'  # URL для входа
 ACCOUNT_ALLOW_REGISTRATION = False
 
 
@@ -246,6 +247,10 @@ USE_TZ    = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR / "static"] 
+STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_ROOT = BASE_DIR / "media" 
+MEDIA_URL = "media/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
